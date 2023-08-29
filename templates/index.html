@@ -1,0 +1,27 @@
+<!-- templates/index.html.j2 -->
+
+<form method="post" action="/Get_Score" enctype="multipart/form-data">
+    <label>Full Name:</label>
+    <input type="text" name="full_name" required><br>
+    
+    <label>Date of Birth (YYYY-MM-DD):</label>
+    <input type="text" name="date_of_birth" required><br>
+    
+    <label>Location:</label>
+    <input type="text" name="location" required><br>
+    
+   
+    <label>LinkedIn Profile:</label>
+    <input type="url" name="linkedin"><br>
+    
+    <label>GitHub Profile:</label>
+    <input type="url" name="github"><br>
+    
+    <label>Job Description (PDF, TXT):</label>
+    <input type="text" name="job_position"  required><br>
+    
+    <label>CV (PDF, TXT):</label>
+    <input type="file" name="cv_pdf" accept=".pdf,.txt" required><br>
+    
+    <button type="submit">Calculate Score</button>
+</form>

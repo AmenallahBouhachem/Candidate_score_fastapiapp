@@ -1,0 +1,50 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo:7
+    restart: always
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    
+    volumes:
+      - ./mongodb_data/:/data/db/
+    ports:
+      - 27017:27017
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    container_name: mongo_ui
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+    
+  minio:
+    image: quay.io/minio/minio:RELEASE.2022-02-18T01-50-10Z
+    volumes:
+      - ./data:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: 'minio_user'
+      MINIO_ROOT_PASSWORD: 'minio_password'
+      MINIO_ADDRESS: ':9000'
+      MINIO_CONSOLE_ADDRESS: ':9001'
+      MINIO_STORAGE_USE_HTTPS: False
+    command: minio server /data
+  fastapi-app:
+    build:
+      context: .
+      dockerfile: C:\Users\Amen Allah\OneDrive\Bureau\Candidate_score\Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo

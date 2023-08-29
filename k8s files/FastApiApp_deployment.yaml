@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-app
+  template:
+    metadata:
+      labels:
+        app: fastapi-app
+    spec:
+      containers:
+        - name: fastapi-app-container
+          image: amenallah01/chinkoloto07:latest
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              memory: "2Gi"    
+              cpu: "200m"      
+            limits:
+              memory: "4Gi"    
+              cpu: "400m"      
+          env:
+            - name: MONGODB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-configmap
+                  key: database_url
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: minio-configmap
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: minio-configmap
+                  key: MINIO_SECRET_KEY
+            - name: MINIO_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: minio-configmap
+                  key: minio_url
+          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-app-service
+spec:
+  selector:
+    app: fastapi-app
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: LoadBalancer

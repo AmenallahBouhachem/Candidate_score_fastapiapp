@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio-statefulset
+  namespace: minio-dev
+  labels:
+    app: minio
+spec:
+  serviceName: minio
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: quay.io/minio/minio:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9000
+          hostPort: 9000
+        env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: minio-configmap
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: minio-configmap
+                  key: MINIO_SECRET_KEY
+        args: 
+        - server
+        - --console-address
+        - :9090  
+        - --address
+        - :9000  
+        - /data
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  # These are converted to volume claims by the controller
+  # and mounted at the paths mentioned above.
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: hostpath  
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: minio-dev
+spec:
+  selector:
+    app: minio
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
+      name: console
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+      name: s3
+  type: LoadBalancer

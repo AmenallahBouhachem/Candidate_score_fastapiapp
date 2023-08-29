@@ -1,0 +1,11 @@
+fastapi
+pydantic
+uvicorn
+pdfplumber
+nltk
+transformers
+scipy
+python-multipart
+pymongo
+minio
+torch
